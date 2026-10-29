@@ -8,6 +8,7 @@ qt_standard_project_setup()
 qt_add_executable(console
     main.cpp
     REQUIREMENTS.md
+    qtaskmanager.h qtaskmanager.cpp
 )
 
 target_link_libraries(console

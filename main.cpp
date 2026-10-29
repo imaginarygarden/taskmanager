@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
     // If you do not need a running Qt event loop, remove the call
     // to QCoreApplication::exec() or use the Non-Qt Plain C++ Application template.
 
-    QTextStream(stdout) << "Hello World" << Qt::endl;
+    QTextStream(stdout) << "=== Qt Task Manager ===" << Qt::endl;
 
-    QTimer::singleShot(5000, &a, &QCoreApplication::quit);
+    QTimer::singleShot(0, &a, &QCoreApplication::quit);
 
     return QCoreApplication::exec();
 }
