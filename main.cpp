@@ -1,10 +1,10 @@
 #include <QCoreApplication>
-#include <QTimer>
-#include <QTextStream>
+
+#include "qtaskmanager.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
     // Set up code that uses the Qt event loop here.
     // Call QCoreApplication::quit() or QCoreApplication::exit() to quit the application.
@@ -17,9 +17,12 @@ int main(int argc, char *argv[])
     // If you do not need a running Qt event loop, remove the call
     // to QCoreApplication::exec() or use the Non-Qt Plain C++ Application template.
 
-    QTextStream(stdout) << "=== Qt Task Manager ===" << Qt::endl;
 
-    QTimer::singleShot(0, &a, &QCoreApplication::quit);
+    // QTimer::singleShot(0, &a, &QCoreApplication::quit);
+
+    QTaskManager manager;
+
+    QObject::connect(&manager, &QTaskManager::processClosed, &app, &QCoreApplication::quit);
 
     return QCoreApplication::exec();
 }
