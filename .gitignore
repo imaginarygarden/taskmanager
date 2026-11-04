@@ -24,6 +24,7 @@ tags
 .directory
 *.debug
 Makefile*
+compile_commands.json*
 *.prl
 *.app
 moc_*.cpp
@@ -82,3 +83,4 @@ CMakeLists.txt.user*
 .uic/
 /build*/
 /.qtcreator/
+/deploy/

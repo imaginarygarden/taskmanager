@@ -1,0 +1,28 @@
+#include <QCoreApplication>
+#include <qobject.h>
+
+#include "qtaskmanager.h"
+
+int main(int argc, char *argv[]) {
+    QCoreApplication app(argc, argv);
+
+    // Set up code that uses the Qt event loop here.
+    // Call QCoreApplication::quit() or QCoreApplication::exit() to quit the
+    // application. A not very useful example would be including #include
+    // <QTimer> near the top of the file and calling QTimer::singleShot(5000,
+    // &a, &QCoreApplication::quit); which quits the application after 5
+    // seconds.
+
+    // If you do not need a running Qt event loop, remove the call
+    // to QCoreApplication::exec() or use the Non-Qt Plain C++ Application
+    // template.
+
+    // QTimer::singleShot(0, &a, &QCoreApplication::quit);
+
+    QTaskManager manager;
+
+    QObject::connect(&manager, &QTaskManager::quit, &app,
+                     &QCoreApplication::quit);
+
+    return QCoreApplication::exec();
+}

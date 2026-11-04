@@ -5,7 +5,14 @@
       "name": "default",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/deploy/${presetName}",
+      "cmakeExecutable": "${sourceDir}/deploy/${presetName}/${executableName}",
       "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_COLOR_DIAGNOSTICS": true,
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_GNUtoMS": false,
         "CMAKE_EXPORT_COMPILE_COMMANDS": true
       }
     }

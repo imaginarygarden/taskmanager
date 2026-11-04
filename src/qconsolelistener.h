@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QMutex>
 
 #ifdef Q_OS_WIN
 #include <QWinEventNotifier>
@@ -11,8 +12,7 @@
 #include <QSocketNotifier>
 #endif
 
-class QConsoleListener : public QObject
-{
+class QConsoleListener final : public QObject {
     Q_OBJECT
 
 #ifdef Q_OS_WIN
@@ -21,17 +21,18 @@ class QConsoleListener : public QObject
     QSocketNotifier m_notifier{fileno(stdin), QSocketNotifier::Read, this};
 #endif
 
-    QThread m_thread;
+    QThread m_thread{this};
 
-public:
+  public:
     explicit QConsoleListener(QObject *parent = nullptr) : QObject{parent} {};
-    virtual ~QConsoleListener() {m_thread.quit(); m_thread.wait();};
+    ~QConsoleListener() override { stop(); };
 
-    void init();
+  public slots:
+    void start();
+    void stop();
 
-signals:
+  signals:
     void newLine(const QString &input);
-
 };
 
 #endif // QCONSOLELISTENER_H

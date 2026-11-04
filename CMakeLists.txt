@@ -3,21 +3,15 @@ project(console LANGUAGES CXX)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core)
 
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
+
 qt_standard_project_setup()
 
-qt_add_executable(console
-    main.cpp
-    REQUIREMENTS.md
-    qtaskmanager.h qtaskmanager.cpp
-    qconsolelistener.h qconsolelistener.cpp
-)
+qt_add_executable(console ${sources})
 
 target_compile_features(console PUBLIC cxx_std_20)
 
-target_link_libraries(console
-    PRIVATE
-        Qt::Core
-)
+target_link_libraries(console PRIVATE Qt::Core)
 
 install(TARGETS console
     BUNDLE  DESTINATION .
@@ -33,9 +27,3 @@ qt_generate_deploy_app_script(
 )
 
 install(SCRIPT ${deploy_script})
-
-# file(CREATE_LINK
-#   "${CMAKE_BINARY_DIR}/compile_commands.json"
-#   "${CMAKE_SOURCE_DIR}/compile_commands.json"
-#   SYMBOLIC
-# )
