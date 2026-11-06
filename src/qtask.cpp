@@ -1,6 +1,7 @@
 #include "qtask.h"
 
 #include <QThread>
+#include <QTimer>
 #include <mutex>
 
 QTask::QTaskResult QTask::process() {
@@ -39,13 +40,11 @@ void QTask::start() {
 void QTask::complete() {
     if (m_status == QTaskStatus::PROCESSING) {
         m_status = QTaskStatus::COMPLETE;
-        emit taskCompleted(m_name);
     }
 }
 
 void QTask::fail() {
     if (m_status == QTaskStatus::PROCESSING) {
         m_status = QTaskStatus::FAILED;
-        emit taskFailed(m_name);
     }
 }

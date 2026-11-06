@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <qcoreapplication.h>
 #include <qobject.h>
 
 #include "qtaskmanager.h"
@@ -21,8 +22,15 @@ int main(int argc, char *argv[]) {
 
     QTaskManager manager;
 
-    QObject::connect(&manager, &QTaskManager::quit, &app,
+    QObject::connect(&manager, &QTaskManager::exited, &app,
                      &QCoreApplication::quit);
 
-    return QCoreApplication::exec();
+    manager.start();
+
+    const int result{QCoreApplication::exec()};
+
+    manager.requestInterruption();
+    manager.wait();
+
+    return result;
 }

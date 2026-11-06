@@ -4,7 +4,6 @@
 #include <QTextStream>
 #include <QtNumeric>
 #include <cstdint>
-#include <qobject.h>
 
 namespace {
 
@@ -30,47 +29,59 @@ QString statusToString(const QTask::QTaskStatus &status) {
 
 }; // namespace
 
-void QTaskProcessor::addTask() {
+QString QTaskProcessor::requestInput(const QString &prompt) {
     QTextStream outputStream{stdout};
-
-    outputStream << "Enter task name: " << Qt::flush;
+    outputStream << prompt << Qt::flush;
 
     QTextStream inputStream{stdin};
-    QTask *task{new QTask{inputStream.readLine(), this}};
+
+    QString input{inputStream.readLine()};
+
+    emit log(prompt + input);
+    return input;
+}
+
+void QTaskProcessor::addTask() {
+
+    QString name{requestInput("Enter task name: ")};
+
+    QTask *task{new QTask{name, this}};
 
     QObject::connect(task, &QTask::taskStarted, this,
                      &QTaskProcessor::taskStarted);
 
-    QObject::connect(task, &QTask::taskCompleted, this,
-                     &QTaskProcessor::taskCompleted);
-
-    QObject::connect(task, &QTask::taskFailed, this,
-                     &QTaskProcessor::taskFailed);
+    QObject::connect(task, &QTask::statusUpdated, this,
+                     &QTaskProcessor::taskUpdated);
 
     m_tasks.append(task);
-    outputStream << QString{"Task added: %1 [%2]"}.arg(
-                        task->name(), statusToString(task->status()))
-                 << Qt::endl;
+    emit log(QString{"Task added: %1 [%2]\n"}.arg(
+        task->name(), statusToString(task->status())));
 }
 
 void QTaskProcessor::listTasks() {
-    QTextStream outputStream{stdout};
+    QString stream{};
 
     for (std::uint8_t iterator{}; auto &task : m_tasks) {
-        outputStream << QString{"%1. %2 [%3]"}.arg(
-                            QString::number(iterator + 1), task->name(),
-                            statusToString(task->status()))
-                     << Qt::endl;
+        stream += QString{"%1. %2 [%3]\n"}.arg(QString::number(iterator + 1),
+                                               task->name(),
+                                               statusToString(task->status()));
 
         ++iterator;
+    }
+
+    if (stream.length() > 0) {
+        emit log(stream);
     }
 }
 
 void QTaskProcessor::startTasks() {
-    QTextStream{stdout} << "Starting task processor.." << Qt::endl;
+    emit log("Starting task processor..\n");
 
     for (std::uint16_t i{}; i < QTaskProcessor::DEFAULT_THREADS; ++i) {
         QTaskWorker *worker{new QTaskWorker{m_tasks, this}};
+
+        QObject::connect(worker, &QTaskWorker::log, this, &QTaskProcessor::log);
+
         worker->start();
         m_workers.append(worker);
     }
@@ -86,26 +97,24 @@ void QTaskProcessor::pauseTasks() {
 void QTaskProcessor::showStats() {
     qsizetype failed{qAbs(m_tasks.size() - m_succeeded)};
 
-    QTextStream{stdout}
-        << QString{"Stats: %1 (succeeded) / %2 (failed) = %3% success rate"}
-               .arg(QString::number(m_succeeded), QString::number(failed),
-                    QString::number(m_succeeded / failed))
-        << Qt::endl;
+    emit log(
+        QString{"Stats: %1 (succeeded) / %2 (failed) = %3% success rate\n"}.arg(
+            QString::number(m_succeeded), QString::number(failed),
+            QString::number(m_succeeded / failed)));
+}
+
+void QTaskProcessor::taskUpdated(const QString &name,
+                                 const QTask::QTaskStatus &status) {
+    QString statusMessage{"failed"};
+
+    if (status == QTask::QTaskStatus::COMPLETE) {
+        m_succeeded++;
+        statusMessage = "completed";
+    }
+
+    emit log(QString{"[Manager] Task %2: %1\n"}.arg(name, statusMessage));
 }
 
 void QTaskProcessor::taskStarted(const QString &name) {
-    QTextStream{stdout} << QString{"[Manager] Task started: %1"}.arg(name)
-                        << Qt::endl;
-}
-
-void QTaskProcessor::taskCompleted(const QString &name) {
-    ++m_succeeded;
-
-    QTextStream{stdout} << QString{"[Manager] Task completed: %1"}.arg(name)
-                        << Qt::endl;
-}
-
-void QTaskProcessor::taskFailed(const QString &name) {
-    QTextStream{stdout} << QString{"[Manager] Task failed: %1"}.arg(name)
-                        << Qt::endl;
+    emit log(QString{"[Manager] Task started: %1"}.arg(name));
 }

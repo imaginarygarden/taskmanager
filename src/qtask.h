@@ -36,12 +36,11 @@ class QTask final : public QObject {
     QTaskStatus status() const { return m_status; }
 
   signals:
+    void statusUpdated(const QString &name, const QTaskStatus &status);
     void taskStarted(const QString &name);
-    void taskCompleted(const QString &name);
-    void taskFailed(const QString &name);
 
   private:
-    static constexpr std::uint16_t DEFAULT_TIMEOUT{5000};
+    static constexpr std::uint16_t DEFAULT_TIMEOUT{1000};
 
     QString m_name;
     QRandomGenerator m_rng{QRandomGenerator::securelySeeded()};

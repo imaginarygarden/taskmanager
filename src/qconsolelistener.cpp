@@ -2,6 +2,12 @@
 
 #include <QTextStream>
 
+void QConsoleListener::requestInput() {
+    QTextStream{stdout} << "> " << Qt::flush;
+    QTextStream stream{stdin};
+    emit newLine(stream.readLine());
+}
+
 void QConsoleListener::start() {
     if (m_thread.isRunning()) {
         return;
@@ -20,7 +26,6 @@ void QConsoleListener::start() {
 #endif
                      ,
                      [this]() {
-                         QTextStream{stdout} << "> " << Qt::flush;
                          QTextStream stream{stdin};
                          emit this->newLine(stream.readLine());
                      });

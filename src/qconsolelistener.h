@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QThread>
-#include <QMutex>
 
 #ifdef Q_OS_WIN
 #include <QWinEventNotifier>
@@ -28,6 +27,7 @@ class QConsoleListener final : public QObject {
     ~QConsoleListener() override { stop(); };
 
   public slots:
+    void requestInput();
     void start();
     void stop();
 

@@ -17,6 +17,9 @@ class QTaskWorker final : public QThread {
   public:
     QTaskWorker(const QList<QTask *> &tasks, QObject *parent = nullptr)
         : m_tasks{tasks}, QThread{parent} {}
+
+  signals:
+    void log(const QString &message);
 };
 
 #endif
